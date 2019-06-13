@@ -4,7 +4,9 @@
 
 ## 安装
 
-`npm i -S translate-google-api`
+```
+npm i -S translate-google-api
+```
 
 ## 用法
 
