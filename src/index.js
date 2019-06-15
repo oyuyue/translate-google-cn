@@ -55,7 +55,6 @@ function translate(text, opts) {
       };
     })
     .then(function({ url, cookie }) {
-      console.log(cookie);
       return got(url, {
         headers: {
           'user-agent':
