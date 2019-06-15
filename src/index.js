@@ -31,7 +31,7 @@ function translate(text, opts) {
 
   return token
     .get(text)
-    .then(function(token) {
+    .then(function({ name, value, cookie }) {
       const url = 'https://translate.google.cn/translate_a/single';
       const data = {
         client: 'webapp',
@@ -47,16 +47,21 @@ function translate(text, opts) {
         kc: 7,
         q: text
       };
-      data[token.name] = token.value;
+      data[name] = value;
 
-      return url + '?' + querystring.stringify(data);
+      return {
+        url: url + '?' + querystring.stringify(data),
+        cookie
+      };
     })
-    .then(function(url) {
+    .then(function({ url, cookie }) {
+      console.log(cookie);
       return got(url, {
         headers: {
           'user-agent':
             'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.80 Safari/537.36',
-          referer: 'https://translate.google.cn/'
+          referer: 'https://translate.google.cn/',
+          cookie
         }
       }).then(function(res) {
         var result = {

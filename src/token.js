@@ -72,10 +72,21 @@ var wr = function(a) {
 // END
 /* eslint-enable */
 
+function parseCookies(cookie = '') {
+  const res = {};
+  const items = cookie.split('; ');
+  items.forEach(item => {
+    const v = item.split('=');
+    res[v[0]] = v.slice(1).join('=');
+  });
+  return res;
+}
+
 const config = new Configstore('google-translate-api');
 
 const window = {
-  TKK: config.get('TKK') || '0'
+  TKK: config.get('TKK') || '0',
+  COOKIE: config.get('COOKIE') || ''
 };
 
 function updateTKK() {
@@ -88,8 +99,7 @@ function updateTKK() {
       got('https://translate.google.cn', {
         headers: {
           'user-agent':
-            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.80 Safari/537.36',
-          referer: 'https://translate.google.cn/'
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.80 Safari/537.36'
         }
       })
         .then(function(res) {
@@ -98,6 +108,12 @@ function updateTKK() {
           if (!TKK) return reject(new Error('can not get token'));
           window.TKK = TKK;
           config.set('TKK', TKK);
+
+          const cookies = res.headers['set-cookie'];
+          if (cookies && Array.isArray(cookies)) {
+            window.COOKIE = 'NID=' + parseCookies(cookies[0])['NID'];
+            config.set('COOKIE', window.COOKIE);
+          }
 
           resolve(TKK);
         })
@@ -108,9 +124,11 @@ function updateTKK() {
 
 function get(text) {
   return updateTKK().then(function() {
-    let tk = sM(text);
-    tk = tk.replace('&tk=', '');
-    return { name: 'tk', value: tk };
+    return {
+      name: 'tk',
+      value: sM(text).replace('&tk=', ''),
+      cookie: window.COOKIE
+    };
   });
 }
 
