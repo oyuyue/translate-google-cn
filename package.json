@@ -1,6 +1,6 @@
 {
   "name": "translate-google-cn",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A free and unlimited API for Google Translate",
   "main": "./src/index.js",
   "repository": {
